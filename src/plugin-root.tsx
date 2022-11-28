@@ -1,5 +1,5 @@
-import {useEffect} from "react";
-import {registerSidebarTool} from "@whiteboards-io/plugins";
+import { useEffect } from "react";
+import { registerSidebarTool } from "@whiteboards-io/plugins";
 import icon from "./icon.svg";
 
 export const PluginRoot = () => {
