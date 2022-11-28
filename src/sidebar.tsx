@@ -5,7 +5,7 @@ import {
     watchPluginBoardData
 } from "@whiteboards-io/plugins";
 import { useAsync } from "react-async-hook";
-import { useCallback, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import Button from "@atlaskit/button";
 
 enum PluginState {
@@ -18,6 +18,30 @@ interface PluginData {
     pluginState: PluginState;
     selectedPerson: UserData | null;
 }
+
+const ShuffleThroughPeople: FC<{people?: UserData[]}> = ({ people }) => {
+    const [currentIndex, setCurrentIndex] = useState(0);
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            if (!people) {
+                return;
+            }
+
+            const nextIndex = currentIndex === people.length - 1 ? 0 : currentIndex + 1;
+            setCurrentIndex(nextIndex);
+        }, 75);
+
+        return () => clearTimeout(timeoutId);
+    }, [currentIndex, people]);
+
+    if (!people) {
+        return null;
+    }
+
+    const currentPerson = people[currentIndex];
+
+    return <>{currentPerson.displayName}</>
+};
 
 export const Sidebar = () => {
     const [pluginState, setPluginState] = useState<PluginState>(PluginState.WAITING);
@@ -65,6 +89,8 @@ export const Sidebar = () => {
         </Button>
         {pluginState === PluginState.WAITING && <p>Waiting for someone to start randomizing</p>}
         {pluginState === PluginState.RANDOMIZING && <p>The dice have been rolled...</p>}
-        {pluginState === PluginState.RESULTS && <p>The algorithm chose {selectedPerson?.id === currentUser.result?.id ? "you" : selectedPerson?.displayName}!</p>}
+        {pluginState === PluginState.RESULTS && <p>The algorithm chose:</p>}
+        {pluginState === PluginState.RANDOMIZING && <ShuffleThroughPeople people={boardUsers.result} /> }
+        {pluginState === PluginState.RESULTS && <p>{selectedPerson?.displayName}</p>}
     </>;
 };
